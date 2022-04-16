@@ -8,7 +8,7 @@
 #include <queue>
 #include "person.h"
 #include "Queue/LinkQueue.h"
-#include "personList.h"
+#include "buildingList.h"
 
 class TubeList;
 
@@ -30,7 +30,7 @@ public:
     }
 
     // 现在在单人队里的和此后单人检测加进来的人都会是密接
-    void SetConfirmed(PersonList& person_list){
+    void SetConfirmed(BuildingList& person_list){
         for(int i = 0;i < single_queue_.GetLength();++i){
             std::string personal_code;
             single_queue_.pop(personal_code);

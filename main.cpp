@@ -1,5 +1,6 @@
 #include <iostream>
-#include "personList.h"
+#include <fstream>
+#include "buildingList.h"
 #include "personQueue.h"
 #include "tubeList.h"
 #include "NATSystem.h"
@@ -10,6 +11,47 @@ void Stop();    // 暂停命令行
 
 int main() {
     NATSystem NAT_system;
+    cout << "从文件读取数据中..." <<endl;
+    try{
+        ifstream in1;
+        in1.open("queue.txt", ios::in);
+        int single_num(0),hybrid_num(0);
+        in1 >> hybrid_num >> single_num;
+        if(hybrid_num < 1 || hybrid_num > 10000 || single_num < 1 || single_num > 10000){
+            cerr << "读入数据不在范围！" <<endl;
+            Stop();
+            return -1;
+        }
+        string person_code;
+        for(int i = 0;i < hybrid_num;++i){
+            in1 >> person_code;
+            NAT_system.QueueUp(person_code, false);
+        }
+        for(int i = 0;i < single_num;++i){
+            in1 >> person_code;
+            NAT_system.QueueUp(person_code, true);
+        }
+        in1.close();
+        ifstream  in2;
+        in2.open("test.txt");
+        int finish_single(0),finish_hybrid(0);
+        in2 >> finish_hybrid >> finish_single;
+        if(finish_single > single_num || finish_single < 0 || finish_hybrid > hybrid_num || finish_hybrid < 0){
+            cerr << "完成人数超范围！" <<endl;
+            Stop();
+            return -2;
+        }
+        NAT_system.NATest(finish_single,true);
+        NAT_system.NATest(finish_hybrid,false);
+        in2.close();
+        cout << "初始化完成！" << endl;
+        Stop();
+    }catch (...){
+        cerr << "读取文件失败！！" << endl;
+        Stop();
+        return -3;
+    }
+
     while(true){
         cout << "      1. 加入核酸排队      " << endl;
         cout << "      2. 检测核酸         " << endl;
@@ -34,7 +76,7 @@ int main() {
                     if(chr == 'e' || chr == 'E') break;
                     cin >> str;
                     if(chr != 'S' && chr != 's' && chr != 'h' && chr != 'H'){
-                        cout << "输入格式不对！" << endl;
+                        cerr << "输入格式不对！" << endl;
                         Stop();
                         continue;
                     }
@@ -42,7 +84,7 @@ int main() {
                         NAT_system.QueueUp(str,(chr == 's' || chr == 'S'));
                         cout << " 排队成功！继续输入：" << endl;
                     }catch(...){
-                        cout << "输入格式不正确或已入队，重新输入！！" << endl;
+                        cerr << "输入格式不正确或已入队，重新输入！！" << endl;
                         Stop();
                         continue;
                     }
@@ -56,7 +98,7 @@ int main() {
                     cin >> chr;
                     if(chr == 'e' || chr == 'E') break;
                     if(chr != '1' && chr != '2'){
-                        cout << "输入格式不对！！" << endl;
+                        cerr << "输入格式不对！！" << endl;
                         Stop();
                         continue;
                     }
@@ -64,14 +106,14 @@ int main() {
                     cout << "请输入检测人数：";
                     cin >> i;
                     if(!cin.good()){    // 防止输入数据错误
-                        cout << "请输入数字！！！" << endl;
+                        cerr << "请输入数字！！！" << endl;
                         cin.clear();//把可恢复的流都恢复
                         cin.ignore();
                         Stop();
                         continue;
                     }
                     if(!NAT_system.NATest(i,chr == '2')){
-                        cout << "人数过多!!" << endl;
+                        cerr << "人数过多!!" << endl;
                         Stop();
                         continue;
                     }
@@ -92,9 +134,9 @@ int main() {
                          << "格式如：00000 1 (1.阳性  2.阴性  3.可疑)" << endl;
                     cin >> str;
                     if(str[0] == 'E' || str[0] == 'e') break;
-                    cin >> chr >> chr;
+                    cin >> chr;
                     if(chr != '1' && chr != '2' && chr != '3'){
-                        cout << "输入测试结果不符合要求。" << endl;
+                        cerr << "输入测试结果不符合要求。" << endl;
                         Stop();
                         continue;
                     }
@@ -105,7 +147,7 @@ int main() {
                     else if(chr == '3' &&
                             NAT_system.RegisterTube(str.substr(0, 5), Person::kSuspected));
                     else{
-                        cout << "未找到此试管或已经登记过！！" << endl;
+                        cerr << "未找到此试管或已经登记过！！" << endl;
                         Stop();
                         continue;
                     }
@@ -124,12 +166,12 @@ int main() {
                     if(str.empty() || str[0] == 'E') break;
                     for(auto& s:str)
                         if(!isalnum(s)){
-                            cout << "不是全数字代码！！" << endl;
+                            cerr << "不是全数字代码！！" << endl;
                             Stop();
                             continue;
                         }
                     if(str.length() != 8){
-                        cout << "不是八位数字代码！！" << endl;
+                        cerr << "不是八位数字代码！！" << endl;
                         Stop();
                         continue;
                     }

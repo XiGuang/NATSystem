@@ -5,13 +5,13 @@
 #ifndef NATSYSTEM_NATSYSTEM_H
 #define NATSYSTEM_NATSYSTEM_H
 
-#include "personList.h"
+#include "buildingList.h"
 #include "personQueue.h"
 #include "tubeList.h"
 
 class NATSystem{
 private:
-    PersonList person_list;
+    BuildingList building_list;
     PersonQueue person_queue;
     TubeList tube_list;
 

@@ -5,9 +5,9 @@
 #include "NATSystem.h"
 
 void NATSystem::QueueUp(const string &personal_code, bool is_single) {
-    if(person_list.FindPerson(personal_code))
+    if(building_list.FindPerson(personal_code))
         throw std::invalid_argument("人员码已排队过！");
-    person_queue.QueueUp(person_list.AddPerson(personal_code),is_single);
+    person_queue.QueueUp(building_list.AddPerson(personal_code), is_single);
 }
 
 bool NATSystem::RegisterTube(const std::string &tube_code, Person::TestStatus status){
@@ -24,23 +24,19 @@ bool NATSystem::RegisterTube(const std::string &tube_code, Person::TestStatus st
         for(int i = 0;i < test_tube->PersonNum();++i)
             test_tube->Individuals()[i]->UpdateTestStatus(Person::kSuspected);
     }else{  // 单人阳性的情况
-        test_tube->Individuals()[0]->UpdateTestStatus(Person::kConfirmed);
-        person_list.UpdateBuildingStatus(test_tube->Individuals()[0]->BuildingNum(),Person::kContiguity);    // 设置同楼为密接
+        building_list.UpdateToConfirmed(*test_tube->Individuals()[0]);  // 设置阳性,同时同楼为密接
         for(int i = -10;true;++i){  // 寻找前面十个人和后面的所有人设置为密接
             if(i == 0) continue;
             int tube_num(std::strtol(test_tube->TubeCode().c_str(), nullptr,10) + i);
             if(tube_num >= 0){
                 auto contiguity_tube = tube_list.FindTube(std::to_string(tube_num));
                 if(contiguity_tube){   // 确保不是空指针
-                    contiguity_tube->Individuals()[0]->UpdateContiguityStatus(Person::kContiguity);
-                    // 设置密接同楼为次密接   （仅当和确诊者不是一栋楼的时候）
-                    if(contiguity_tube->Individuals()[0]->BuildingNum() != test_tube->Individuals()[0]->BuildingNum())
-                        person_list.UpdateBuildingStatus(contiguity_tube->Individuals()[0]->BuildingNum(), Person::kSecContiguity);
+                    building_list.UpdateToContiguity(*contiguity_tube->Individuals()[0]);
                 }else
                     break;
             }
         }
-        person_queue.SetConfirmed(person_list);
+        person_queue.SetConfirmed(building_list);
     }
     test_tube->SetRegistered();
     return true;
@@ -50,7 +46,7 @@ bool NATSystem::NATest(bool is_single){    // 核酸检测
     if(is_single && !person_queue.single_queue_.IsEmpty()){
         std::string test_personal_code;  // 取队头
         person_queue.single_queue_.pop(test_personal_code);
-        auto person = person_list.FindPerson(test_personal_code);
+        auto person = building_list.FindPerson(test_personal_code);
         if(person != nullptr){
             tube_list.AddTube(*person,true);
             person->UpdateTestStatus(Person::kToUpload);
@@ -59,7 +55,7 @@ bool NATSystem::NATest(bool is_single){    // 核酸检测
     }else if(!is_single && !person_queue.hybrid_queue_.IsEmpty()){
         std::string test_personal_code;
         person_queue.hybrid_queue_.pop(test_personal_code);
-        auto person = person_list.FindPerson(test_personal_code);
+        auto person = building_list.FindPerson(test_personal_code);
         if(person == nullptr)
             throw std::bad_alloc();
         static TestTube* tube(nullptr);  // 方便下次混检加入试管
@@ -87,7 +83,7 @@ bool NATSystem::NATest(int people_num, bool is_single) {
 }
 
 void NATSystem::ShowPersonalStatus(const std::string& personal_code,std::ostream& out){
-    auto person = person_list.FindPerson(personal_code);
+    auto person = building_list.FindPerson(personal_code);
     out << personal_code << std::endl;
     if(person == nullptr){
         out << " 未检测 " << std::endl;
@@ -131,26 +127,27 @@ void NATSystem::ShowPersonalStatus(const std::string& personal_code,std::ostream
 }
 
 void NATSystem::ShowAllStatus(ostream &out) {
+    building_list.FlushStatuses();
     out << "   阳性: ";
-    person_list.ShowTestStatus(Person::kConfirmed,out);
+    building_list.ShowTestStatus(Person::kConfirmed, out);
     out << std::endl;
     out << "   可疑: ";
-    person_list.ShowTestStatus(Person::kSuspected,out);
+    building_list.ShowTestStatus(Person::kSuspected, out);
     out << std::endl;
     out << "   密接: ";
-    person_list.ShowContiguityStatus(Person::kContiguity,out);
+    building_list.ShowContiguityStatus(Person::kContiguity, out);
     out << std::endl;
     out << "   次密接: ";
-    person_list.ShowContiguityStatus(Person::kSecContiguity,out);
+    building_list.ShowContiguityStatus(Person::kSecContiguity, out);
     out << std::endl;
     out << "   阴性: ";
-    person_list.ShowTestStatus(Person::kNegative,out);
+    building_list.ShowTestStatus(Person::kNegative, out);
     out << std::endl;
     out << "   待上传: ";
-    person_list.ShowTestStatus(Person::kToUpload,out);
+    building_list.ShowTestStatus(Person::kToUpload, out);
     out << std::endl;
     out << "   排队中: ";
-    person_list.ShowTestStatus(Person::kQueuing,out);
+    building_list.ShowTestStatus(Person::kQueuing, out);
     out << std::endl;
 }
 

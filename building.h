@@ -23,7 +23,12 @@ public:
         return people_.InsertElem(Person(personal_code,test_status,con_status));
     }
 
-    const Person* FindPerson(const std::string& personal_code) const {
+    Person& AddPerson(const Person& person){
+        if(person.BuildingNum() != building_code_) throw std::invalid_argument("楼号不匹配");
+        return people_.InsertElem(person);
+    }
+
+    Person* FindPerson(const std::string& personal_code) const {
         for(int i = 0;i < people_.GetLength();++i)
             if(people_[i].PersonalCode() == personal_code)
                 return &people_[i];
@@ -38,7 +43,14 @@ public:
         return {};
     }
 
+    inline void UpdateToConfirmed(Person& person){  // 设置阳性
+        if(person.BuildingNum() != building_code_) return;
+        person.UpdateTestStatus(Person::kConfirmed);
+        UpdateToContiguity();
+    }
+
     inline void UpdateToContiguity(const std::string &personal_code){   // 设置密接
+        if(personal_code.substr(0,3) != building_code_) return;
         for(int i = 0; i < people_.GetLength(); ++i)
             if(people_[i].PersonalCode() == personal_code) {
                 UpdateToContiguity(people_[i]);
@@ -47,6 +59,7 @@ public:
     }
 
     inline void UpdateToContiguity(Person& person){
+        if(person.BuildingNum() != building_code_) return;
         person.UpdateContiguityStatus(Person::kContiguity);
         UpdateToSecContiguity();
     }
@@ -79,6 +92,8 @@ public:
                 out << people_[i].PersonalCode() << "  ";
     }
 
+    std::string BuildingCode() const {return building_code_;}
+
 private:
     LinkList<Person> people_;
     std::string building_code_;
@@ -88,6 +103,11 @@ private:
     inline void UpdateToSecContiguity(){
         for(int i = 0; i < people_.GetLength(); ++i)
             people_[i].UpdateContiguityStatus(Person::kSecContiguity);
+    }
+
+    inline void UpdateToContiguity(){
+        for(int i = 0; i < people_.GetLength(); ++i)
+            people_[i].UpdateContiguityStatus(Person::kContiguity);
     }
 };
 
