@@ -29,9 +29,9 @@ public:
         person.UpdateTestStatus(Person::kQueuing);
     }
 
-    // 现在在单人队里的和此后单人检测加进来的人都会是密接
+    // 现在在单人队里的人都是密接
     void SetConfirmed(BuildingList& person_list){
-        for(int i = 0;i < single_queue_.GetLength();++i){
+        for(int i = 0;i < single_queue_.size(); ++i){
             std::string personal_code;
             single_queue_.pop(personal_code);
             person_list.UpdateToContiguity(personal_code);
@@ -39,20 +39,22 @@ public:
         }
     }
 
-    int LengthOfSingleQueue(){return single_queue_.GetLength();}
+    int LengthOfSingleQueue(){return single_queue_.size();}
 
-    int LengthOfHybridQueue(){return hybrid_queue_.GetLength();}
+    int LengthOfHybridQueue(){return hybrid_queue_.size();}
 
     friend std::ostream &operator<<(std::ostream& out,PersonQueue& person_queue){
         out << std::endl << "\t单人检测\t混合检测" << std::endl;
-        out << (person_queue.single_queue_.GetLength() == 0 ? "\t  无\t" : "\t\t   ")
-            << (person_queue.hybrid_queue_.GetLength() == 0 ? "   无" : "") << std::endl;
-        for(int i = 0;i < person_queue.single_queue_.GetLength() || i < person_queue.hybrid_queue_.GetLength();++i){
+        out << (person_queue.single_queue_.empty() ? "\t  无\t" : "\t\t   ")
+            << (person_queue.hybrid_queue_.empty() ? "   无" : "") << std::endl;
+        for(int i = 0;i < person_queue.single_queue_.size() || i < person_queue.hybrid_queue_.size(); ++i){
             std::string single_code,hybrid_code;
-            if(i < person_queue.single_queue_.GetLength())
+            if(i < person_queue.single_queue_.size()) {
                 person_queue.single_queue_.pop(single_code);
-            if(i < person_queue.hybrid_queue_.GetLength())
+            }
+            if(i < person_queue.hybrid_queue_.size()){
                 person_queue.hybrid_queue_.pop(hybrid_code);
+            }
             out << '\t' << (single_code.empty() ? "         " : single_code)
                 << '\t' << (hybrid_code.empty() ? "" : hybrid_code) << std::endl;
             if(!single_code.empty())

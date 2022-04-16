@@ -17,8 +17,9 @@ int main() {
         in1.open("queue.txt", ios::in);
         int single_num(0),hybrid_num(0);
         in1 >> hybrid_num >> single_num;
-        if(hybrid_num < 1 || hybrid_num > 10000 || single_num < 1 || single_num > 10000){
+        if(hybrid_num < 0 || hybrid_num > 10000 || single_num < 0 || single_num > 10000){
             cerr << "读入数据不在范围！" <<endl;
+            in1.close();
             Stop();
             return -1;
         }
@@ -33,9 +34,10 @@ int main() {
         }
         in1.close();
         ifstream  in2;
-        in2.open("test.txt");
+        in2.open("test.txt",ios::in);
         int finish_single(0),finish_hybrid(0);
         in2 >> finish_hybrid >> finish_single;
+        in2.close();
         if(finish_single > single_num || finish_single < 0 || finish_hybrid > hybrid_num || finish_hybrid < 0){
             cerr << "完成人数超范围！" <<endl;
             Stop();
@@ -43,9 +45,9 @@ int main() {
         }
         NAT_system.NATest(finish_single,true);
         NAT_system.NATest(finish_hybrid,false);
-        in2.close();
         cout << "初始化完成！" << endl;
         Stop();
+
     }catch (...){
         cerr << "读取文件失败！！" << endl;
         Stop();

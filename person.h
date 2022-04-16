@@ -41,7 +41,7 @@ public:
 
     Person():personal_status_(){}
 
-    Person(const Person&) = default;
+    Person(const Person& person):personal_status_(person.PersonalStatus()),personal_code_(person.personal_code_){}
 
     Person& operator=(const Person&) = default;
 

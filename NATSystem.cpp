@@ -43,16 +43,16 @@ bool NATSystem::RegisterTube(const std::string &tube_code, Person::TestStatus st
 }
 
 bool NATSystem::NATest(bool is_single){    // 核酸检测
-    if(is_single && !person_queue.single_queue_.IsEmpty()){
+    if(is_single && !person_queue.single_queue_.empty()){
         std::string test_personal_code;  // 取队头
         person_queue.single_queue_.pop(test_personal_code);
         auto person = building_list.FindPerson(test_personal_code);
         if(person != nullptr){
-            tube_list.AddTube(*person,true);
+            tube_list.AddTube(true).AddPerson(*person);
             person->UpdateTestStatus(Person::kToUpload);
         }
         return true;
-    }else if(!is_single && !person_queue.hybrid_queue_.IsEmpty()){
+    }else if(!is_single && !person_queue.hybrid_queue_.empty()){
         std::string test_personal_code;
         person_queue.hybrid_queue_.pop(test_personal_code);
         auto person = building_list.FindPerson(test_personal_code);
@@ -60,9 +60,8 @@ bool NATSystem::NATest(bool is_single){    // 核酸检测
             throw std::bad_alloc();
         static TestTube* tube(nullptr);  // 方便下次混检加入试管
         if(tube == nullptr || tube->PersonNum() >= 10)   // 如果试管不存在或者满了则再加入试管
-            tube = &tube_list.AddTube(*person, false);
-        else
-            tube->AddPerson(*person);
+            tube = &tube_list.AddTube(false);
+        tube->AddPerson(*person);
         person->UpdateTestStatus(Person::kToUpload);
         return true;
     }

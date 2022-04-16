@@ -141,7 +141,7 @@ Status LinkList<ElemType>::GetElem(int i, ElemType &e) const
 template <class ElemType>
 Status LinkList<ElemType>::SetElem(int i, const ElemType &e)
 // 操作结果：将单链表的第i个位置的元素赋值为e,
-//	i的取值范围为1≤i≤length,
+//	i的取值范围为1≤i≤size,
 //	i合法时函数返回SUCCESS,否则函数返回RANGE_ERROR
 {
 	if (i < 1 || i > length)	
@@ -159,7 +159,7 @@ Status LinkList<ElemType>::SetElem(int i, const ElemType &e)
 template <class ElemType>
 Status LinkList<ElemType>::DeleteElem(int i, ElemType &e)
 // 操作结果：删除单链表的第i个位置的元素, 并用e返回其值,
-//	i的取值范围为1≤i≤length,
+//	i的取值范围为1≤i≤size,
 //	i合法时函数返回SUCCESS,否则函数返回RANGE_ERROR
 {
 	if (i < 1 || i > length)		
@@ -181,7 +181,7 @@ Status LinkList<ElemType>::DeleteElem(int i, ElemType &e)
 template <class ElemType>
 Status LinkList<ElemType>::InsertElem(int i, const ElemType &e)
 // 操作结果：在单链表的第i个位置前插入元素e
-//	i的取值范围为1≤i≤length+1
+//	i的取值范围为1≤i≤size+1
 //	i合法时返回SUCCESS, 否则函数返回RANGE_ERROR
 {
 	if (i < 1 || i > length+1)

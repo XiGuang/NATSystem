@@ -16,8 +16,8 @@ private:
 public:
     TubeList() = default;
 
-    inline TestTube& AddTube(Person& person,bool is_single = true){
-        return tubes_.InsertElem(TestTube(person,is_single));
+    inline TestTube& AddTube(bool is_single = true){
+        return tubes_.InsertElem(TestTube(is_single));
     }
 
     inline TestTube* FindTube(const std::string &tube_code) const {

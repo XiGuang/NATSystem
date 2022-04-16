@@ -2,7 +2,7 @@
 #define __LK_QUEUE_H__
 
 #include "../Assistance.h"			// 辅助软件包
-#include "Node.h"				// 结点类
+#include "../LinkList/Node.h"				// 结点类
 
 // 链队列类
 
@@ -16,8 +16,8 @@ protected:
 public:
 	LinkQueue();									// 无参数的构造函数
 	virtual ~LinkQueue();							// 析构函数
-	int GetLength() const;								// 求队列长度			 
-	bool IsEmpty() const;								// 判断队列是否为空
+	int size() const;								// 求队列长度
+	bool empty() const;								// 判断队列是否为空
 	void Clear();									// 将队列清空
 	void Traverse(void (*Visit)(const ElemType &)) const ;	// 遍历队列
 	Status pop(ElemType &e);				     // 出队操作
@@ -45,7 +45,7 @@ LinkQueue<ElemType>::~LinkQueue()
 }
 
 template<class ElemType>
-int LinkQueue<ElemType>::GetLength() const
+int LinkQueue<ElemType>::size() const
 // 操作结果：返回队列长度			 
 {
 	int count = 0;		// 初始化计数器 
@@ -55,7 +55,7 @@ int LinkQueue<ElemType>::GetLength() const
 }
 
 template<class ElemType>
-bool LinkQueue<ElemType>::IsEmpty() const
+bool LinkQueue<ElemType>::empty() const
 // 操作结果：如队列为空，则返回true，否则返回false
 {
    return rear == front;
@@ -89,7 +89,7 @@ Status LinkQueue<ElemType>::pop(ElemType &e)
 // 操作结果：如果队列非空，那么删除队头元素，并用e返回其值，函数返回SUCCESS,
 //	否则函数返回UNDER_FLOW，
 {
-	if (!IsEmpty()) 	{	// 队列非空
+	if (!empty()) 	{	// 队列非空
 		Node<ElemType> *p = front->next;	// 指向队列头素
 		e = p->data;						// 用e返回队头元素
 		front->next = p->next;				// front指向下一元素
@@ -107,7 +107,7 @@ Status LinkQueue<ElemType>::GetHead(ElemType &e) const
 // 操作结果：如果队列非空，那么用e返回队头元素，函数返回SUCCESS,
 //	否则函数返回UNDER_FLOW，
 {
-	if (!IsEmpty()) 	{	            // 队列非空
+	if (!empty()) 	{	            // 队列非空
 		e = front->next->data;		// 用e返回队头元素
 		return SUCCESS;
 	}

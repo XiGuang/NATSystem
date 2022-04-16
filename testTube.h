@@ -17,20 +17,22 @@ protected:
     bool registered_{false};
 
 public:
-    explicit TestTube(Person& person,bool is_single = true):individuals_(nullptr),individuals_num_(1){
+
+    explicit TestTube(bool is_single):individuals_(nullptr),individuals_num_(0){
         static int single_num(0),hybrid_num(0);
         if(is_single){
+            if(single_num > 9999) throw std::out_of_range("Á÷Ë®ºÅ³¬·¶Î§!");
             tube_code_ = std::to_string(single_num++);
             tube_code_ = std::string("000").substr(0,4 - tube_code_.length()) + tube_code_;
             tube_code_ = '1' + tube_code_;
             individuals_ = new Person*[1];
         }else{
+            if(hybrid_num > 9999) throw std::out_of_range("Á÷Ë®ºÅ³¬·¶Î§!");
             tube_code_ = std::to_string(hybrid_num++);
             tube_code_ = std::string("000").substr(0,4 - tube_code_.length()) + tube_code_;
             tube_code_ = '0' + tube_code_;
             individuals_ = new Person*[10];
         }
-        individuals_[0] = &person;
     }
 
     ~TestTube(){
@@ -44,7 +46,7 @@ public:
     TestTube& operator=(const TestTube& test_tube) {
         if(this == &test_tube) return *this;
         individuals_num_ = test_tube.individuals_num_;
-        individuals_ = new Person*[individuals_num_];
+        individuals_ = new Person*[(test_tube.IsSingle() ? 1 : 10)];
         for(int i = 0;i < individuals_num_;++i)
             individuals_[i] = test_tube.individuals_[i];
         tube_code_ = test_tube.tube_code_;
