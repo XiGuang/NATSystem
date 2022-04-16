@@ -150,8 +150,3 @@ void NATSystem::ShowAllStatus(ostream &out) {
     building_list.ShowTestStatus(Person::kQueuing, out);
     out << std::endl;
 }
-
-
-
-
-

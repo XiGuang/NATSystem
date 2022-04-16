@@ -163,7 +163,7 @@ int main() {
                     string str;
                     cout << "请输入想要查询的八位人员代码（输入E返回）:" << endl;
                     cin >> str;
-                    if(str.empty() || str[0] == 'E') break;
+                    if(str.empty() || str[0] == 'E' || str[0] == 'e') break;
                     for(auto& s:str)
                         if(!isalnum(s)){
                             cerr << "不是全数字代码！！" << endl;
@@ -184,6 +184,7 @@ int main() {
                 cout << "请重新输入：" << endl;
                 break;
         }
+        std::system("cls");
     }
     return 0;
 }

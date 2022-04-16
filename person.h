@@ -72,10 +72,10 @@ public:
     inline std::string BuildingNum() const {return personal_code_.substr(0, 3);}
 
     // 房间号
-    inline std::string RoomNum() const {return personal_code_.substr(3,7);}
+    __attribute__((unused)) inline std::string RoomNum() const {return personal_code_.substr(3,7);}
 
     // 人员号
-    inline std::string PersonNum() const {return personal_code_.substr(7);}
+    __attribute__((unused)) inline std::string PersonNum() const {return personal_code_.substr(7);}
 
 private:
     Status personal_status_;

@@ -47,31 +47,6 @@ public:
         return nullptr;
     }
 
-    Person::Status QueryStatus(const std::string &personal_code){
-        auto building = FindBuilding(personal_code.substr(0, 3));
-        if (building != nullptr)
-            return building->FindPerson(personal_code)->PersonalStatus();
-        return {};
-    }
-
-    bool UpdateTestStatus(const std::string &personal_code,const Person::TestStatus test_status){
-        auto person = FindPerson(personal_code);
-        if(person != nullptr){
-            person->UpdateTestStatus(test_status);
-            return true;
-        }
-        return false;
-    }
-
-    bool UpdateContiguityStatus(const std::string &personal_code,const Person::ContiguityStatus contiguity_status){
-        auto person = FindPerson(personal_code);
-        if(person != nullptr){
-            person->UpdateContiguityStatus(contiguity_status);
-            return true;
-        }
-        return false;
-    }
-
     /// 设置密接，同时设置次密接
     inline void UpdateToContiguity(const std::string &personal_code){
         auto building = FindBuilding(personal_code.substr(0,3));

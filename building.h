@@ -35,7 +35,7 @@ public:
         return nullptr;
     }
 
-    Person::Status QueryStatus(const std::string &personal_code){
+    __attribute__((unused)) Person::Status QueryStatus(const std::string &personal_code){
         for(int i = 0;i < people_.GetLength();++i){
             if(people_[i].PersonalCode() == personal_code)
                 return people_[i].PersonalStatus();
@@ -88,7 +88,7 @@ public:
         // 若楼中没有这种状态的直接跳过
         if(status < Person::kNoContiguity && !status_[status + 5]) return;
         for(int i = 0; i < people_.GetLength(); ++i)
-            if(people_[i].PersonalStatus().contiguity_status == status)
+            if(people_[i].PersonalContiguityStatus() == status && people_[i].PersonalTestStatus() != Person::kConfirmed)
                 out << people_[i].PersonalCode() << "  ";
     }
 

@@ -65,7 +65,7 @@ public:
     inline auto PersonNum() const {return individuals_num_;}
 
     // 流水号
-    inline std::string SerialNum() const {return tube_code_.substr(1);}
+    __attribute__((unused)) inline std::string SerialNum() const {return tube_code_.substr(1);}
 
     bool AddPerson(Person& person){
         if(IsSingle() || individuals_num_ > 9)   // 单人管或已满十人不允许添加
