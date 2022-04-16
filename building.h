@@ -5,6 +5,8 @@
 #ifndef NATSYSTEM_BUILDING_H
 #define NATSYSTEM_BUILDING_H
 
+#include <utility>
+
 #include "person.h"
 #include "LinkList/LinkList.h"
 
@@ -12,18 +14,16 @@ class Building{
 public:
     Building() = default;
 
-    Building(const std::string& building_code):building_code_(building_code){}
+    explicit Building(std::string  building_code):building_code_(std::move(building_code)){}
 
     Person& AddPerson(const std::string& personal_code,
                       const Person::TestStatus test_status = Person::kNoTesting,
                       const Person::ContiguityStatus con_status = Person::kNoContiguity){
         if(personal_code.substr(0,3) != building_code_) throw std::invalid_argument("楼号不匹配");
-        auto &person = people_.InsertElem(Person(personal_code,test_status,con_status));
-        ChangeStatus(person);
-        return person;
+        return people_.InsertElem(Person(personal_code,test_status,con_status));
     }
 
-    Person* FindPerson(const std::string& personal_code){
+    const Person* FindPerson(const std::string& personal_code) const {
         for(int i = 0;i < people_.GetLength();++i)
             if(people_[i].PersonalCode() == personal_code)
                 return &people_[i];
@@ -38,44 +38,57 @@ public:
         return {};
     }
 
-    // 同楼栋的设置为密接或次密接
-    inline void UpdateBuildingStatus(const Person::ContiguityStatus status = Person::kContiguity){
-        for(int i = 0; i < people_.GetLength(); ++i) {
-            ChangeContiguityStatus(status,people_[i].PersonalContiguityStatus());
-            people_[i].UpdateContiguityStatus(status);
+    inline void UpdateToContiguity(const std::string &personal_code){   // 设置密接
+        for(int i = 0; i < people_.GetLength(); ++i)
+            if(people_[i].PersonalCode() == personal_code) {
+                UpdateToContiguity(people_[i]);
+                return;
+            }
+    }
+
+    inline void UpdateToContiguity(Person& person){
+        person.UpdateContiguityStatus(Person::kContiguity);
+        UpdateToSecContiguity();
+    }
+
+    // 输出前必须先刷新
+    void FlushStatus(){
+        for(auto& s:status_)
+            s = false;
+        for(int i = 0;i < people_.GetLength();++i){
+            if(people_[i].PersonalTestStatus() < Person::kNoTesting)
+                status_[people_[i].PersonalTestStatus()] = true;
+            if(people_[i].PersonalContiguityStatus() < Person::kNoContiguity)
+                status_[people_[i].PersonalContiguityStatus() + 5] = true;
         }
+    }
+
+    inline void ShowTestStatus(const Person::TestStatus status,std::ostream& out){
+        // 若楼中没有这种状态的直接跳过
+        if(status < Person::kNoTesting && !status_[status]) return;
+        for(int i = 0; i < people_.GetLength(); ++i)
+            if(people_[i].PersonalStatus().test_status == status)
+                out << people_[i].PersonalCode() << "  ";
+    }
+
+    inline void ShowContiguityStatus(const Person::ContiguityStatus status,std::ostream& out){
+        // 若楼中没有这种状态的直接跳过
+        if(status < Person::kNoContiguity && !status_[status + 5]) return;
+        for(int i = 0; i < people_.GetLength(); ++i)
+            if(people_[i].PersonalStatus().contiguity_status == status)
+                out << people_[i].PersonalCode() << "  ";
     }
 
 private:
     LinkList<Person> people_;
     std::string building_code_;
-    int status_[7]{0};    /// 分别表示楼中是否有 阳性，可疑，阴性，待上传，排队中，密接，次密接 的人
+    bool status_[7]{false};    /// 分别表示楼中是否有 阳性，可疑，阴性，待上传，排队中，密接，次密接 的人
 
-    void ChangeStatus(const Person& person){
-        if(person.PersonalTestStatus() < Person::kNoTesting)
-            ++status_[person.PersonalStatus().test_status];
-        if(person.PersonalContiguityStatus() < Person::kNoContiguity)
-            ++status_[person.PersonalStatus().contiguity_status + 5];
+    // 同楼栋的设置为次密接
+    inline void UpdateToSecContiguity(){
+        for(int i = 0; i < people_.GetLength(); ++i)
+            people_[i].UpdateContiguityStatus(Person::kSecContiguity);
     }
-
-    void ChangeTestStatus(const Person::TestStatus now_status,const Person::TestStatus old_status){
-        if(now_status < old_status){
-            if(now_status < Person::kNoTesting)
-                ++status_[now_status];
-            if(old_status < Person::kNoTesting)
-                --status_[old_status];
-        }
-    }
-
-    void ChangeContiguityStatus(const Person::ContiguityStatus now_status,const Person::ContiguityStatus old_status){
-        if(now_status < old_status){
-            if(now_status < Person::kNoContiguity)
-                ++status_[now_status + 5];
-            if(old_status < Person::kNoContiguity)
-                --status_[old_status + 5];
-        }
-    }
-
 };
 
 #endif //NATSYSTEM_BUILDING_H

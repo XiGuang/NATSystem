@@ -7,6 +7,7 @@
 
 #include "person.h"
 #include "LinkList/LinkList.h"
+#include "building.h"
 
 // 人员信息表
 class PersonList{
