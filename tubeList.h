@@ -27,6 +27,11 @@ public:
         return nullptr;
     }
 
+    friend std::ostream& operator<<(std::ostream& out,const TubeList& tube_list){
+        for(int i = 0; i < tube_list.tubes_.GetLength(); ++i)
+            out << tube_list.tubes_[i] << std::endl;
+        return out;
+    }
 };
 
 #endif //NATSYSTEM_TUBELIST_H

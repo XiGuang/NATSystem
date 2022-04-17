@@ -68,6 +68,29 @@ int main() {
         cout << endl;
         switch (c) {
             case '1':{
+                ifstream in1;
+                in1.open("queue.txt", ios::in);
+                int single_num(0),hybrid_num(0);
+                in1 >> hybrid_num >> single_num;
+                if(hybrid_num < 0 || hybrid_num > 10000 || single_num < 0 || single_num > 10000){
+                    cerr << "读入数据不在范围！" <<endl;
+                    in1.close();
+                    Stop();
+                    return -1;
+                }
+                string person_code;
+                cout << "初始化混合检测排队人：";
+                for(int i = 0;i < hybrid_num;++i){
+                    in1 >> person_code;
+                    cout << person_code << "  ";
+                }
+                cout << endl;
+                cout << "初始化单人检测排队人：";
+                for(int i = 0;i < single_num;++i){
+                    in1 >> person_code;
+                    cout << person_code << "  ";
+                }
+                cout << endl;
                 std::string str;
                 char chr;
                 while(true){
@@ -94,6 +117,7 @@ int main() {
             }
             case '2':{
                 while(true) {
+                    NAT_system.ShowTubeList(cout);
                     char chr;
                     cout << "请选择 1.混合检测 2.单人检测 （输入E返回）" << endl;
                     cin >> chr;

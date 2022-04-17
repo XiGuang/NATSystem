@@ -76,6 +76,12 @@ public:
         return true;
     }
 
+    friend std::ostream& operator<<(std::ostream& out,const TestTube& tube){
+        for(int i = 0;i < tube.individuals_num_;++i)
+            out << tube.individuals_[i]->PersonalCode() << "  ";
+        out << "µÄÊÔ¹Ü±àºÅÊÇ " << tube.tube_code_;
+        return out;
+    }
 };
 
 

@@ -30,8 +30,9 @@ public:
 
     void ShowAllStatus(std::ostream& out);
 
-    void ShowQueue(std::ostream& out){out << person_queue;}
+    inline void ShowQueue(std::ostream& out){out << person_queue;}
 
+    inline void ShowTubeList(std::ostream& out){out << tube_list;}
 };
 
 
