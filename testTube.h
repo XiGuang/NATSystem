@@ -70,7 +70,7 @@ public:
     __attribute__((unused)) inline std::string SerialNum() const {return tube_code_.substr(1);}
 
     bool AddPerson(Person& person){
-        if(IsSingle() || individuals_num_ > 9)   // 单人管或已满十人不允许添加
+        if((IsSingle() && individuals_num_ > 0) || individuals_num_ > 9)   // 单人管或已满十人不允许添加
             return false;
         individuals_[individuals_num_++] = &person;
         return true;

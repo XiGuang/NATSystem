@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include "buildingList.h"
 #include "personQueue.h"
 #include "tubeList.h"
@@ -159,6 +158,7 @@ int main() {
             }
             case '5':
                 NAT_system.ShowAllStatus(cout);
+                Stop();
                 break;
             case '6':{
                 while(true){
@@ -193,5 +193,6 @@ int main() {
 
 void Stop(){
     std::system("PAUSE");
+    cin.ignore((numeric_limits< streamsize >::max)(), '\n');
     std::system("cls");
 }

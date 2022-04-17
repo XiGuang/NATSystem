@@ -83,7 +83,6 @@ bool NATSystem::NATest(int people_num, bool is_single) {
 
 void NATSystem::ShowPersonalStatus(const std::string& personal_code,std::ostream& out){
     auto person = building_list.FindPerson(personal_code);
-    out << personal_code << std::endl;
     if(person == nullptr){
         out << " Î´¼ì²â " << std::endl;
         return;
