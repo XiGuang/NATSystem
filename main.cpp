@@ -45,11 +45,11 @@ int main() {
         NAT_system.NATest(finish_single,true);
         NAT_system.NATest(finish_hybrid,false);
         cout << "初始化完成！" << endl;
-        Stop();
-
+        std::system("PAUSE");
+        std::system("cls");
     }catch (...){
         cerr << "读取文件失败！！" << endl;
-        Stop();
+        std::system("PAUSE");
         return -3;
     }
 
