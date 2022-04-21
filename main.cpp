@@ -12,38 +12,40 @@ int main() {
     NATSystem NAT_system;
     cout << "从文件读取数据中..." <<endl;
     try{
-        ifstream in1;
-        in1.open("queue.txt", ios::in);
+        ifstream in;
+        in.open("queue.in", ios::in);
         int single_num(0),hybrid_num(0);
-        in1 >> hybrid_num >> single_num;
+        in >> hybrid_num >> single_num;
         if(hybrid_num < 0 || hybrid_num > 10000 || single_num < 0 || single_num > 10000){
             cerr << "读入数据不在范围！" <<endl;
-            in1.close();
+            in.close();
             Stop();
             return -1;
         }
         string person_code;
         for(int i = 0;i < hybrid_num;++i){
-            in1 >> person_code;
+            in >> person_code;
             NAT_system.QueueUp(person_code, false);
+            cout << person_code << "  ";
         }
+        cout << "加入了混合管队列" << endl;
         for(int i = 0;i < single_num;++i){
-            in1 >> person_code;
+            in >> person_code;
             NAT_system.QueueUp(person_code, true);
+            cout << person_code << "  ";
         }
-        in1.close();
-        ifstream  in2;
-        in2.open("test.txt",ios::in);
+        cout << "加入了单人管队列" << endl;
         int finish_single(0),finish_hybrid(0);
-        in2 >> finish_hybrid >> finish_single;
-        in2.close();
+        in >> finish_hybrid >> finish_single;   // 读入完成检测的人数
+        in.close();
         if(finish_single > single_num || finish_single < 0 || finish_hybrid > hybrid_num || finish_hybrid < 0){
             cerr << "完成人数超范围！" <<endl;
             Stop();
             return -2;
         }
-        NAT_system.NATest(finish_single,true);
-        NAT_system.NATest(finish_hybrid,false);
+        NAT_system.NATest(finish_single, true, cout);
+        NAT_system.NATest(finish_hybrid, false, cout);
+//        NAT_system.ShowTubeList(cout);
         cout << "初始化完成！" << endl;
         std::system("PAUSE");
         std::system("cls");
@@ -68,29 +70,6 @@ int main() {
         cout << endl;
         switch (c) {
             case '1':{
-                ifstream in1;
-                in1.open("queue.txt", ios::in);
-                int single_num(0),hybrid_num(0);
-                in1 >> hybrid_num >> single_num;
-                if(hybrid_num < 0 || hybrid_num > 10000 || single_num < 0 || single_num > 10000){
-                    cerr << "读入数据不在范围！" <<endl;
-                    in1.close();
-                    Stop();
-                    return -1;
-                }
-                string person_code;
-                cout << "初始化混合检测排队人：";
-                for(int i = 0;i < hybrid_num;++i){
-                    in1 >> person_code;
-                    cout << person_code << "  ";
-                }
-                cout << endl;
-                cout << "初始化单人检测排队人：";
-                for(int i = 0;i < single_num;++i){
-                    in1 >> person_code;
-                    cout << person_code << "  ";
-                }
-                cout << endl;
                 std::string str;
                 char chr;
                 while(true){
@@ -106,7 +85,8 @@ int main() {
                     }
                     try{
                         NAT_system.QueueUp(str,(chr == 's' || chr == 'S'));
-                        cout << " 排队成功！继续输入：" << endl;
+                        cout << str << " 加入了" << (chr == 's' || chr == 'S' ? "单人" : "混合")
+                            << "管队列" << endl;
                     }catch(...){
                         cerr << "输入格式不正确或已入队，重新输入！！" << endl;
                         Stop();
@@ -117,7 +97,6 @@ int main() {
             }
             case '2':{
                 while(true) {
-                    NAT_system.ShowTubeList(cout);
                     char chr;
                     cout << "请选择 1.混合检测 2.单人检测 （输入E返回）" << endl;
                     cin >> chr;
@@ -137,7 +116,8 @@ int main() {
                         Stop();
                         continue;
                     }
-                    if(!NAT_system.NATest(i,chr == '2')){
+                    try{ NAT_system.NATest(i, chr == '2',cout); }
+                    catch (...){
                         cerr << "人数过多!!" << endl;
                         Stop();
                         continue;

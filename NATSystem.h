@@ -20,9 +20,9 @@ public:
 
     void QueueUp(const std::string& personal_code, bool is_single);
 
-    bool NATest(bool is_single);
+    TestTube * NATest(bool is_single);
 
-    bool NATest(int people_num,bool is_single);
+    bool NATest(int people_num, bool is_single, std::ostream &out);
 
     bool RegisterTube(const std::string &tube_code, Person::TestStatus status = Person::kNegative);
 
