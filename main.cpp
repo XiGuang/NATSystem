@@ -45,7 +45,6 @@ int main() {
         }
         NAT_system.NATest(finish_single, true, cout);
         NAT_system.NATest(finish_hybrid, false, cout);
-//        NAT_system.ShowTubeList(cout);
         cout << "初始化完成！" << endl;
         std::system("PAUSE");
         std::system("cls");

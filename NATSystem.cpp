@@ -77,20 +77,11 @@ bool NATSystem::NATest(int people_num, bool is_single, std::ostream &out) {
     for(int i = 0;i < people_num;++i) {
         tube_point = NATest(is_single);
         if(tube_point == nullptr) return false;
-        if(is_single)
-            out << tube_point->Individuals()[0]->PersonalCode() << " 的试管是 "
-                << tube_point->TubeCode() << std::endl;
-        else if(tube_point->PersonNum() == 10){ // 混检满十个输出
-            for(int j = 0; j < 10; ++j)
-                out << tube_point->Individuals()[j]->PersonalCode() << "  ";
-            out << "的试管是 " << tube_point->TubeCode() << std::endl;
-        }
+        if(is_single || tube_point->PersonNum() == 10) // 单人或混检满十个输出
+            out << *tube_point << std::endl;
     }
-    if(tube_point != nullptr && !is_single && tube_point->PersonNum() < 10){ // 输出混检最后不满十人的部分
-        for(int i = 0;i < tube_point->PersonNum();++i)
-            out << tube_point->Individuals()[i]->PersonalCode() << "  ";
-        out << "的试管是 " << tube_point->TubeCode() << std::endl;
-    }
+    if(tube_point != nullptr && !is_single && tube_point->PersonNum() < 10) // 输出混检最后不满十人的部分
+        out << *tube_point << std::endl;
     return true;
 }
 
