@@ -27,8 +27,8 @@ bool NATSystem::RegisterTube(const std::string &tube_code, Person::TestStatus st
         building_list.UpdateToConfirmed(*test_tube->Individuals()[0]);  // 设置阳性,同时同楼为密接
         for(int i = -10;true;++i){  // 寻找前面十个人和后面的所有人设置为密接
             if(i == 0) continue;
-            int tube_num(std::strtol(test_tube->TubeCode().c_str(), nullptr,10) + i);
-            if(tube_num >= 0){
+            int tube_num(std::stoi(test_tube->TubeCode()) + i);
+            if(tube_num >= 10000){
                 auto contiguity_tube = tube_list.FindTube(std::to_string(tube_num));
                 if(contiguity_tube){   // 确保不是空指针
                     building_list.UpdateToContiguity(*contiguity_tube->Individuals()[0]);
@@ -36,31 +36,30 @@ bool NATSystem::RegisterTube(const std::string &tube_code, Person::TestStatus st
                     break;
             }
         }
-        person_queue.SetConfirmed(building_list);
+        person_queue.SetContiguity(building_list);
     }
     test_tube->SetRegistered();
     return true;
 }
 
 TestTube * NATSystem::NATest(bool is_single){    // 核酸检测
-    if(is_single && !person_queue.single_queue_.empty()){
+    if(is_single && !person_queue.single_queue_.empty()){   // 单人检测且检测队列不为空
         std::string test_personal_code;
-        person_queue.single_queue_.pop(test_personal_code); // 取队头
+        person_queue.single_queue_.pop(test_personal_code); // 取单人检测的队头
         auto person = building_list.FindPerson(test_personal_code);
-        if(person != nullptr){  // 能找到人，则将人的指针加入试管并标记人为待上传状态
-            person->UpdateTestStatus(Person::kToUpload);
+        if(person != nullptr){
             auto &tube_refer = tube_list.AddTube(true);
             tube_refer.AddPerson(*person);
+            person->UpdateTestStatus(Person::kToUpload);   // 标记人为待上传状态
             return &tube_refer;
         }
     }else if(!is_single && !person_queue.hybrid_queue_.empty()){
         std::string test_personal_code;
-        person_queue.hybrid_queue_.pop(test_personal_code);
+        person_queue.hybrid_queue_.pop(test_personal_code); // 取混合检测的队头
         auto person = building_list.FindPerson(test_personal_code);
-        if(person == nullptr)
-            throw std::bad_alloc();
-        static TestTube* tube_pointer(nullptr);  // 方便下次混检加入试管
-        if(tube_pointer == nullptr || tube_pointer->PersonNum() >= 10)   // 如果试管不存在或者满了则再加入新试管
+        if(person == nullptr)   return nullptr;
+        static TestTube* tube_pointer(nullptr);  // static 方便下次混检加入试管
+        if(tube_pointer == nullptr || tube_pointer->PersonNum() >= 10)   // 若试管不存在或者满了10人
             tube_pointer = &tube_list.AddTube(false);
         tube_pointer->AddPerson(*person);
         person->UpdateTestStatus(Person::kToUpload);
@@ -72,10 +71,10 @@ TestTube * NATSystem::NATest(bool is_single){    // 核酸检测
 bool NATSystem::NATest(int people_num, bool is_single, std::ostream &out) {
     if((is_single && people_num > person_queue.LengthOfSingleQueue())
             || (!is_single && people_num > person_queue.LengthOfHybridQueue()))
-        throw std::out_of_range("欲检测人数超出排队人数");
+        return false;   // 若要检测的人数大于队列中已有的人数，直接返回false
     TestTube *tube_point(nullptr);
     for(int i = 0;i < people_num;++i) {
-        tube_point = NATest(is_single);
+        tube_point = NATest(is_single); // 调用一次检测一人的检测函数
         if(tube_point == nullptr) return false;
         if(is_single || tube_point->PersonNum() == 10) // 单人或混检满十个输出
             out << *tube_point << std::endl;

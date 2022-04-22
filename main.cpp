@@ -115,8 +115,8 @@ int main() {
                         Stop();
                         continue;
                     }
-                    try{ NAT_system.NATest(i, chr == '2',cout); }
-                    catch (...){
+                    // 若测试不成功
+                    if(!NAT_system.NATest(i, chr == '2',cout)){
                         cerr << "人数过多!!" << endl;
                         Stop();
                         continue;

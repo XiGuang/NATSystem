@@ -12,8 +12,8 @@
 // 人员信息表
 class BuildingList{
 private:
-    LinkList<Building> buildings_;
-
+    LinkList<Building> buildings_;  // 楼链表
+    // 根据楼号找楼
     Building* FindBuilding(const std::string& building_code){
         for(int i = 0;i < buildings_.GetLength();++i)
             if(buildings_[i].BuildingCode() == building_code)
@@ -24,22 +24,17 @@ private:
 public:
     BuildingList() = default;
 
-    explicit BuildingList(const Person& person){
-        auto building = &buildings_.InsertElem(Building(person.BuildingNum()));
-        building->AddPerson(person);
-    }
-
     BuildingList(const BuildingList&) = delete;
-
+    // 添加人到对应的楼链表
     inline Person& AddPerson(const std::string &personal_code,
                              const Person::TestStatus status = Person::kNoTesting,
                              const Person::ContiguityStatus status1 = Person::kNoContiguity){
-        auto building = FindBuilding(personal_code.substr(0,3));
-        if(building == nullptr)
+        auto building = FindBuilding(personal_code.substr(0,3));    // 查找楼
+        if(building == nullptr) // 若楼不存在，则插入楼
             building = &buildings_.InsertElem(Building(personal_code.substr(0,3)));
-        return building->AddPerson(personal_code,status,status1);
+        return building->AddPerson(personal_code,status,status1);   // 把人添加到楼里
     }
-
+    // 根据人员代码寻找人
     Person *FindPerson(const std::string &personal_code){
         auto building = FindBuilding(personal_code.substr(0, 3));
         if (building != nullptr)
@@ -60,23 +55,23 @@ public:
         if(building != nullptr)
             building->UpdateToContiguity(person);
     }
-
+    /// 设置阳性，同时设置同楼为密接
     void UpdateToConfirmed(Person& person){
         auto building = FindBuilding(person.BuildingNum());
         if(building != nullptr)
             building->UpdateToConfirmed(person);
     }
-
+    // 展示所有特定检测状态的人员代码
     inline void ShowTestStatus(const Person::TestStatus status,std::ostream& out){
         for(int i = 0; i < buildings_.GetLength(); ++i)
             buildings_[i].ShowTestStatus(status,out);
     }
-
+    // 展示所有特定密接状态的人员代码
     inline void ShowContiguityStatus(const Person::ContiguityStatus status,std::ostream& out){
         for(int i = 0; i < buildings_.GetLength(); ++i)
             buildings_[i].ShowContiguityStatus(status,out);
     }
-
+    // 刷新楼的状态
     inline void FlushStatuses(){
         for(int i = 0;i < buildings_.GetLength();++i)
             buildings_[i].FlushStatus();
